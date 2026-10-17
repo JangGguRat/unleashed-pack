@@ -1,0 +1,78 @@
+# main 브랜치에 push 할 때마다:
+#   1) index.toml 재생성 (packwiz refresh)
+#   2) 친구용 Prism 인스턴스 zip 생성
+#   3) GitHub Pages 에 모드팩 배포
+name: Deploy modpack
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Refresh index
+        run: python tools/refresh.py
+
+      - name: Download packwiz-installer-bootstrap
+        run: curl -fsSL -o packwiz-installer-bootstrap.jar https://github.com/packwiz/packwiz-installer-bootstrap/releases/latest/download/packwiz-installer-bootstrap.jar
+
+      - name: Build site
+        env:
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          set -e
+          mkdir -p _site
+          cp pack.toml index.toml _site/
+          # index.toml 에 올라간 파일만 복사
+          python - <<'PY'
+          import re, shutil, pathlib
+          for f in re.findall(r'^file = "(.+)"$', open("index.toml", encoding="utf-8").read(), re.M):
+              dst = pathlib.Path("_site") / f
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(f, dst)
+          PY
+          python tools/build_instance.py \
+            --pack-url "$BASE_URL/pack.toml" \
+            --bootstrap packwiz-installer-bootstrap.jar \
+            --out "_site/UNLEASHED.zip"
+          cat > _site/index.html <<HTML
+          <!doctype html><meta charset="utf-8"><title>UNLEASHED</title>
+          <body style="font-family:sans-serif;max-width:560px;margin:40px auto;padding:0 16px;line-height:1.6">
+          <h1>UNLEASHED 모드팩</h1>
+          <p>Prism Launcher → 인스턴스 추가 → 가져오기 → 아래 주소 붙여넣기</p>
+          <pre style="background:#eee;padding:12px;overflow-x:auto">$BASE_URL/UNLEASHED.zip</pre>
+          <p><a href="UNLEASHED.zip">zip 직접 다운로드</a></p>
+          </body>
+          HTML
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
