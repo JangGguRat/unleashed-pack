@@ -1,0 +1,5 @@
+# 모드팩에 넣을 내 모드 프로젝트 목록
+# 형식:  모드팩에 들어갈 이름|프로젝트 폴더 경로   (한 줄에 하나, # 은 주석)
+# 예시:
+# unleashed-combat|C:\Users\me\IdeaProjects\unleashed-combat
+# animstudio|C:\Users\me\IdeaProjects\animstudio

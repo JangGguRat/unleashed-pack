@@ -1,0 +1,6 @@
+{
+  "_설명": "친구들이 받을 Prism Launcher 인스턴스 설정. 서버 주소만 바꾸면 됩니다.",
+  "instance_name": "UNLEASHED",
+  "server_address": "",
+  "max_memory_mb": 4096
+}
