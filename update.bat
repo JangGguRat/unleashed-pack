@@ -1,4 +1,7 @@
 @echo off
+rem PATH 에 Windows 기본 명령어 폴더가 빠져 있어도 동작하도록 보정
+set "PATH=%SystemRoot%\System32;%SystemRoot%;%SystemRoot%\System32\Wbem;%PATH%"
+if exist "%ProgramFiles%\Git\cmd\git.exe" set "PATH=%ProgramFiles%\Git\cmd;%PATH%"
 chcp 65001 >nul
 setlocal EnableDelayedExpansion
 cd /d "%~dp0"
