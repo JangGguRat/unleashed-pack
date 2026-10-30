@@ -3,4 +3,4 @@
 # 예시:
 # unleashed-combat|C:\Users\me\IdeaProjects\unleashed-combat
 # animstudio|C:\Users\me\IdeaProjects\animstudio
-unleashed-combat|C:\Users\User\IdeaProjects\unleashed-combat\unleashed-combat
+unleashed-combat|C:\Users\User\IdeaProjects\unleashed-combat-26.3\unleashed-combat
